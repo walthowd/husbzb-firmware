@@ -1,28 +1,29 @@
 FROM ubuntu:18.04 
 MAINTAINER Walt Howd <walthowd@gmail.com>
 
-VOLUME ["/config"]
+WORKDIR /tmp/silabs
 
 RUN apt-get update \
-  && apt-get install -y wget python-pip unzip
+  && apt-get install -y wget python-pip unzip jq
 
 RUN pip install xmodem pyserial
 
 RUN mkdir -p /tmp/silabs
 
 # Get firmware
-RUN cd /tmp/silabs && wget http://developer.silabs.com/studio/v4/control/stacks/PrivateGA/updates/binary/com.silabs.stack.znet.v6.4.feature_root_6.4.1.0
-RUN cd /tmp/silabs &&  unzip -p com.silabs.stack.znet.v6.4.feature_root_6.4.1.0 developer/sdks/gecko_sdk_suite/v2.4/protocol/zigbee/ncp-images/em3581/ncp-uart-xon-xoff-use-with-serial-uart-btl-6.4.1.ebl > ncp-uart-xon-xoff-use-with-serial-uart-btl-6.4.1.ebl
+RUN wget http://developer.silabs.com/studio/v4/control/stacks/PrivateGA/updates/binary/com.silabs.stack.znet.v6.4.feature_root_6.4.1.0
+RUN unzip -p com.silabs.stack.znet.v6.4.feature_root_6.4.1.0 developer/sdks/gecko_sdk_suite/v2.4/protocol/zigbee/ncp-images/em3581/ncp-uart-xon-xoff-use-with-serial-uart-btl-6.4.1.ebl > ncp-uart-xon-xoff-use-with-serial-uart-btl-6.4.1.ebl
 RUN rm -f /tmp/silabs/com.silabs.stack.znet.v6.4.feature_root_6.4.1.0
 
 # Get ncp.py
-RUN cd /tmp/silabs && wget http://devtools.silabs.com/solutions/apt/pool/main/s/silabs-zigbee-gateway/silabs-zigbee-gateway_2.5.0-3_armhf.deb
-RUN cd /tmp/silabs && ar x /tmp/silabs/silabs-zigbee-gateway_2.5.0-3_armhf.deb
-RUN cd /tmp/silabs && tar -xvf data.tar.gz ./opt/siliconlabs/zigbeegateway/tools/ncp-updater/ncp.py --strip-components 6 -C /tmp/silabs/
-RUN cd /tmp/silabs && sed -i "s/CEL_PID.=.*/CEL_PID = '8A2A'/" ncp.py
-RUN rm -f /tmp/silabs/silabs-zigbee-gateway_2.5.0-3_armhf.deb
-RUN rm -f /tmp/silabs/control.tar.gz
-RUN rm -f /tmp/silabs/data.tar.gz
+RUN wget http://devtools.silabs.com/solutions/apt/pool/main/s/silabs-zigbee-gateway/silabs-zigbee-gateway_2.5.0-3_armhf.deb
+RUN ar x /tmp/silabs/silabs-zigbee-gateway_2.5.0-3_armhf.deb
+RUN tar -xvf data.tar.gz ./opt/siliconlabs/zigbeegateway/tools/ncp-updater/ncp.py --strip-components 6 -C /tmp/silabs/
+RUN sed -i "s/CEL_PID.=.*/CEL_PID = '8A2A'/" ncp.py
+RUN rm -f silabs-zigbee-gateway_2.5.0-3_armhf.deb
+RUN rm -f *.gz
 RUN rm -f /tmp/silabs/debian-binary
 
-CMD [ "/usr/bin/python2.7", "/tmp/silabs/ncp.py", "scan" ]
+ADD update-firmware.sh /tmp/silabs
+
+CMD [ "/tmp/silabs/update-firmware.sh" ]
