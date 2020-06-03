@@ -1,7 +1,7 @@
 # husbzb-firmware
 Nortek GoControl HUSBZB-1 Firmware updater image. 
 
-This docker image will update the firmware from the shipped 5.4.1-194 (or other) to the latest pubically available image from SiLabs (6.4.1)
+This docker image will update the firmware from the shipped 5.4.1-194 (or other) to the latest publicly available image from SiLabs (6.4.1)
 
 ## To use:
 docker run --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware 
