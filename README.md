@@ -24,5 +24,5 @@ If you want to use this image to manually update your firmware run:
 ```
 docker run --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware bash
 cd /tmp/silabs
-python2.7 ncp.py -p /dev/ttyUSB1 -f ncp-uart-sw.ebl 
+python2.7 ncp.py flash -p /dev/ttyUSB1 -f ncp-uart-sw.ebl 
 ```
