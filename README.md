@@ -31,6 +31,13 @@ Make sure you are in */tmp/silabs* by changing directory and then flash:
 ```
 cd /tmp/silabs
 ./ncp.py flash -p /dev/ttyUSB1 -f ncp-uart-sw.ebl 
+Restarting NCP into Bootloader mode...
+CEL stick
+EM3581 Serial Bootloader v5.4.1.0 b962
+
+Successfully restarted into bootloader mode! Starting upload of NCP image... 
+Finished!
+Rebooting NCP...
 ```
 Wait for the stick to reboot, then run *ncp.py* again to verify upgrade
 ```
