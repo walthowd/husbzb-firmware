@@ -28,4 +28,4 @@ ADD update-firmware.sh /tmp/silabs
 ADD ncp.py /tmp/silabs
 ADD ncp-uart-sw.ebl /tmp/silabs
 
-CMD [ "/tmp/silabs/update-firmware.sh" ]
+CMD /tmp/silabs/update-firmware.sh
