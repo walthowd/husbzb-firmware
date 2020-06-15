@@ -26,6 +26,6 @@ RUN mkdir -p /tmp/silabs
 
 ADD update-firmware.sh /tmp/silabs
 ADD ncp.py /tmp/silabs
-ADD ncp-uart-sw.ebl /tmp/silabs
+ADD *.ebl /tmp/silabs/
 
 CMD /tmp/silabs/update-firmware.sh
