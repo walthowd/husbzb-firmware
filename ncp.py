@@ -35,8 +35,8 @@ CEL_BAUD = 57600
 CEL_XON_XOFF = True
 CEL_RTS_CTS = False
 # Silicon Labs WSTK (J-Link Pro OB)
-WSTK_VID = '1366'
-WSTK_PID = '0105'
+WSTK_VID = '10C4'
+WSTK_PID = 'EA60'
 WSTK_BAUD = 115200
 WSTK_XON_XOFF = False
 WSTK_RTS_CTS = True
@@ -58,6 +58,8 @@ parser_flash.set_defaults(which='flash')
 
 parser_scan = subparsers.add_parser('scan', help='Scan OS for attached Zigbee NCPs.')
 parser_scan.set_defaults(which='scan')
+
+isV8 = False
 
 # HELPER
 def randSeqUpTo(n):
@@ -155,7 +157,7 @@ def ezspV6Init(ser):
         return ERROR_NCP_WRONG_EZSP_VERSION
     # EZSP v6 init ok
     return NO_ERROR
-	
+
 def ezspV7Init(ser):
     #flush input buffer
     ser.flushInput()
@@ -180,7 +182,38 @@ def ezspV7Init(ser):
     if resp[1:5] != b'\x42\xA1\xA8\x53':
         return ERROR_NCP_WRONG_EZSP_VERSION
     # EZSP v7 init ok
-    return NO_ERROR	
+    return NO_ERROR
+
+def ezspV8Init(ser):
+    # flush input buffer
+    ser.flushInput()
+    # EZSP RST Frame
+    ser.write(b'\x1A\xC0\x38\xBC\x7E')
+    # Wait for RSTACK FRAME (Reset ACK)
+    resp = ser.read(7)
+    # If we get an invalid RSTACK FRAME, fail detection
+    if resp != b'\x1A\xC1\x02\x0B\x0A\x52\x7E':
+        return ERROR_NCP_INVALID_ACK
+    # EZSP Configuration Frame: version ID: 0x00
+    # Note: Must be sent before any other EZSP commands
+    # { FRAME CTR + EZSP [0x00 0x00 0x00 0x07] + CRC + FRAME END }
+    ser.write(b'\x00\x42\x21\xA8\x5C\x2C\xA0\x7E')
+    # Wait for Data Response { protocolVersion, stackType, stackVersion }
+    # this must be ACK'd
+    resp = ser.read(11)
+    # DATA ACK response frame
+    ser.write(b'\x81\x60\x59\x7E')
+    # Check ncp data response:
+    #                      FRC  |       EZSP        |     Data     |  -CRC-  | Flag
+    # 8.0.0 ncp example: { 0x01 0x42 0xA1 0xA8 0x5C 0x28 0x25 0xD5 0x30 0x86 0x7E }
+    if resp[1:5] != b'\x42\xA1\xA8\x5C':
+        print(''.join(format(x, '02x') for x in resp)
+        return ERROR_NCP_WRONG_EZSP_VERSION
+    # EZSP v8 init ok
+    global isV8 
+    isV8 = True
+    return NO_ERROR
+
 
 def flash(port, file):
     # STATIC FUNCTIONS
@@ -232,7 +265,7 @@ def flash(port, file):
     time.sleep(1)
 
     # EZSP protocol initialization
-    if ezspV7Init(ser)!=NO_ERROR and ezspV6Init(ser)!=NO_ERROR and ezspV5Init(ser)!=NO_ERROR and ezspV4Init(ser)!=NO_ERROR:
+    if ezspV8Init(ser)!=NO_ERROR and ezspV7Init(ser)!=NO_ERROR and ezspV6Init(ser)!=NO_ERROR and ezspV5Init(ser)!=NO_ERROR and ezspV4Init(ser)!=NO_ERROR:
         print 'NCP no ZigBee Ack. Please try again.'
         sys.exit(1)
 
@@ -355,25 +388,47 @@ def scan():
                 time.sleep(1)
 
                 # EZSP protocol initialization...
-                if ezspV7Init(ser)==NO_ERROR or ezspV6Init(ser)==NO_ERROR or ezspV5Init(ser)==NO_ERROR or ezspV4Init(ser)==NO_ERROR:
+                if ezspV8Init(ser)==NO_ERROR or ezspV7Init(ser)==NO_ERROR or ezspV6Init(ser)==NO_ERROR or ezspV5Init(ser)==NO_ERROR or ezspV4Init(ser)==NO_ERROR:
                     #flush input buffer
                     ser.flushInput()
 
-                    # EZSP Configuration Frame: getValue ID: 0xAA
-                    # { FRAME CTR + EZSP [0x01 0x00 0xAA 0x11] + CRC + FRAME END }
-                    # Note: FRAME CTR is 0x11 which needs to be escaped [ 0x7D 0x31 ]
-                    ser.write(b'\x7D\x31\x43\x21\x02\x45\x85\xB2\x7E')
+                    if isV8 == True:
+                        # EZSP Configuration Frame: getValue ID: 0xAA
+                        # { FRAME CTR + EZSP [0x01 0x00 0xAA 0x11] + CRC + FRAME END }
+                        # Note: FRAME CTR is 0x11 which needs to be escaped [ 0x7D 0x31 ]
+                        ser.write(b'\x7D\x31\x43\x21\xA9\xFE\x2A\x04\x30\x3A\x7E')
 
-                    # EZSP Response Frame: getValue ID: 0xAA
-                    # { FRAME CTR + EZSP (SAMPLE) [0x1 0x80 0xaa 0x0 0x7 0x57 0x0 0x5 0x7 0x0 0x0 0x0] + CRC + FRAME END}
-                    # EZSP Format {CTR + FRAME CONTROL + COMMAND USED + EMBER STATUS + RETURNED DATA LENGTH + RETURNED DATA}
-                    # Returned Data: Build Number, unused?, Major version, Minor Version, Patch Version, Special Version, Type
-                    versioninfo = trans(ser.read(16)[1:])[5:]
-                    portjson['deviceType'] = 'zigbee'
-                    portjson['stackVersion'] = str(versioninfo[2]) + '.' + str(versioninfo[3]) + '.' + str(versioninfo[4]) + '-' + str(versioninfo[0])
-                    # Include a special version if it exists
-                    if versioninfo[5] != 0:
-                        portjson['stackVersion'] += 's' + str(versioninfo[5])
+                        # EZSP Response Frame: getValue ID: 0xAA
+                        # { FRAME CTR + EZSP (SAMPLE) [0x1 0x80 0xaa 0x0 0x7 0x57 0x0 0x5 0x7 0x0 0x0 0x0] + CRC + FRAME END}
+                        # EZSP Format {CTR + FRAME CONTROL + COMMAND USED + EMBER STATUS + RETURNED DATA LENGTH + RETURNED DATA}
+                        # Returned Data: Build Number, unused?, Major version, Minor Version, Patch Version, Special Version, Type
+                        # RetVal = {12}{43}{A1}{A9}{FE}{2A}{15}{B5}{5D}{95}{4C}{22}{A9}{55}{38}{59}{E5}{7E}
+                        readstuff = ser.read(18)
+                        #print(readstuff)
+
+                        versioninfo = trans(readstuff[1:])[6:]
+                        #print(versioninfo)
+
+                        portjson['deviceType'] = 'zigbee'
+                        portjson['stackVersion'] = str(versioninfo[3]) + '.' + str(versioninfo[4]) + '.' + str(versioninfo[5]) + '-' + str(versioninfo[2]*256 + versioninfo[1])
+                        # Include a special version if it exists
+                        if versioninfo[6] != 0:
+                            portjson['stackVersion'] += 's' + str(versioninfo[6])
+                    else:
+                        # EZSP Configuration Frame: getValue ID: 0xAA
+                        # { FRAME CTR + EZSP [0x01 0x00 0xAA 0x11] + CRC + FRAME END }
+                        # Note: FRAME CTR is 0x11 which needs to be escaped [ 0x7D 0x31 ]
+                        ser.write(b'\x7D\x31\x43\x21\x02\x45\x85\xB2\x7E')
+                        # EZSP Response Frame: getValue ID: 0xAA
+                        # { FRAME CTR + EZSP (SAMPLE) [0x1 0x80 0xaa 0x0 0x7 0x57 0x0 0x5 0x7 0x0 0x0 0x0] + CRC + FRAME END}
+                        # EZSP Format {CTR + FRAME CONTROL + COMMAND USED + EMBER STATUS + RETURNED DATA LENGTH + RETURNED DATA}
+                        # Returned Data: Build Number, unused?, Major version, Minor Version, Patch Version, Special Version, Type
+                        versioninfo = trans(ser.read(16)[1:])[5:]
+                        portjson['deviceType'] = 'zigbee'
+                        portjson['stackVersion'] = str(versioninfo[2]) + '.' + str(versioninfo[3]) + '.' + str(versioninfo[4]) + '-' + str(versioninfo[0])
+                        # Include a special version if it exists
+                        if versioninfo[5] != 0:
+                            portjson['stackVersion'] += 's' + str(versioninfo[5])
                 else:
                     sys.stderr.write('No ZigBee Ack. %s \n' % port[0]);
                     portjson['deviceType'] = 'unknown'
