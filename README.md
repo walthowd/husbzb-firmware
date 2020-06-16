@@ -49,3 +49,5 @@ Connecting to.. /dev/ttyUSB1 57600 True False
 ### HUSBZB-1 Firmware Recovery
 
 In the event of a bad flash or unexpected event, the bootloader for the EM3581 on the HUSBZB-1 can be accessed by resetting the stick and shorting TP17 to GND with a a serial connection (115200 8/N/1 no hw or sw flow control). On device startup, unshort TP17 and send a carriage return over the serial connection. You should be returned to the bootloader menu where a image can be uploaded via XMODEM. 
+
+![HUSBZB-1](husbzb-1.jpg)
