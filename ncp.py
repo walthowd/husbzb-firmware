@@ -207,7 +207,6 @@ def ezspV8Init(ser):
     #                      FRC  |       EZSP        |     Data     |  -CRC-  | Flag
     # 8.0.0 ncp example: { 0x01 0x42 0xA1 0xA8 0x5C 0x28 0x25 0xD5 0x30 0x86 0x7E }
     if resp[1:5] != b'\x42\xA1\xA8\x5C':
-        print(''.join(format(x, '02x') for x in resp)
         return ERROR_NCP_WRONG_EZSP_VERSION
     # EZSP v8 init ok
     global isV8 
