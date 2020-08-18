@@ -4,9 +4,11 @@ MAINTAINER Walt Howd <walthowd@gmail.com>
 WORKDIR /tmp/silabs
 
 RUN apt-get update \
-  && apt-get install -y wget python-pip unzip jq
+  && apt-get install -y git wget python-pip python3-pip unzip jq
 
 RUN pip install xmodem pyserial
+
+RUN pip3 install --upgrade git+git://github.com/zigpy/bellows.git@multiversion
 
 RUN mkdir -p /tmp/silabs
 
