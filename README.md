@@ -46,6 +46,30 @@ Connecting to.. /dev/ttyUSB1 57600 True False
 {"ports": [{"stackVersion": "6.6.3-151", "deviceType": "zigbee", "pid": "8A2A", "port": "/dev/ttyUSB1", "vid": "10C4"}]}
 ```
 
+### Controller migration
+Latest versions of bellows support migrating from one coordinator to another. This allows you to move between sticks without resetting and rejoining all devices in your zigpy network. 
+
+For Elelabs adapters with hardcodes baud rates, you need to always add `-b 115200` as a paramter to bellows.  
+
+NOTE: This is currently in testing mode.
+
+To backup your existing configration:
+```
+docker run --device=/dev/ttyUSB1:/dev/ttyUSB1 -v .:/data -e EZSP_DEVICE='/dev/ttyUSB1' -it walthowd/husbzb-firmware bash
+bellows info
+bellows backup > /data/bellows-backup.txt
+exit
+```
+
+Remove old stick, insert new stick (find correct ttyUSB port in `dmesg`) and restart container:
+```
+docker run --device=/dev/ttyUSB1:/dev/ttyUSB1 -v .:/data -e EZSP_DEVICE='/dev/ttyUSB1' -it walthowd/husbzb-firmware bash
+bellows info
+bellows restore --i-understand-i-can-update-eui64-only-once-and-i-still-want-to-do-it -B /data/bellows-backup.txt
+bellows info
+```
+On subsequent `bellows info` runs check that the EUI64 matches your backup, that the PANID matches and that the trustCenterLongAddress addresses matches. If they do not match, re-run the `bellows restore` as `bellows restore -f -B /data/bellows-backup.txt` (Omitting the `--i-understand-i-can-update-eui64-only-once-and-i-still-want-to-do-it`)
+
 ### HUSBZB-1 Firmware Recovery
 
 In the event of a bad flash or unexpected event, the bootloader for the EM3581 on the HUSBZB-1 can be accessed by resetting the stick and shorting TP17 to GND with a a serial connection (115200 8/N/1 no hw or sw flow control). On device startup, unshort TP17 and send a carriage return over the serial connection. You should be returned to the bootloader menu where a image can be uploaded via XMODEM. 
