@@ -1,0 +1,3 @@
+### WARNING
+
+As of September 2020, hardware flow control is not supported by bellows/zigpy. Don't flash any of the images in the `hw-flow-control` folder unless you know what you are doing.
