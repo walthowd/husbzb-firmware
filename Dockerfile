@@ -8,7 +8,7 @@ RUN apt-get update \
 
 RUN pip install xmodem pyserial
 
-RUN pip3 install --upgrade git+git://github.com/zigpy/bellows.git@multiversion
+RUN pip3 install --upgrade git+git://github.com/zigpy/bellows.git
 
 RUN mkdir -p /tmp/silabs
 
