@@ -46,8 +46,10 @@ Connecting to.. /dev/ttyUSB1 57600 True False
 {"ports": [{"stackVersion": "6.6.3-151", "deviceType": "zigbee", "pid": "8A2A", "port": "/dev/ttyUSB1", "vid": "10C4"}]}
 ```
 
-### Controller migration
+### Coordinator migration
 Latest versions of bellows support migrating from one coordinator to another. This allows you to move between sticks without resetting and rejoining all devices in your zigpy network. 
+
+For seamless migration, you need to overwrite the EUI64 on your target adapter. This is a one time operation and can not be undone or changed in future (without a SWD flasher) so this should only be done if you are sure of the change. If you do not overwrite the EUI64 the binding tables on your devices will be incorrect and they will need to be reset and rejoined. 
 
 For Elelabs adapters with hardcodes baud rates, you need to always add `-b 115200` as a paramter to bellows.  
 
@@ -55,7 +57,7 @@ NOTE: This is currently in testing mode.
 
 To backup your existing configration:
 ```
-docker run --device=/dev/ttyUSB1:/dev/ttyUSB1 -v .:/data -e EZSP_DEVICE='/dev/ttyUSB1' -it walthowd/husbzb-firmware bash
+docker run --device=/dev/ttyUSB1:/dev/ttyUSB1 -v .:/data -e EZSP_DEVICE='/dev/ttyUSB1' -e LANG='C.UTF-8' -it walthowd/husbzb-firmware bash
 bellows info
 bellows backup > /data/bellows-backup.txt
 exit
@@ -63,7 +65,7 @@ exit
 
 Remove old stick, insert new stick (find correct ttyUSB port in `dmesg`) and restart container:
 ```
-docker run --device=/dev/ttyUSB1:/dev/ttyUSB1 -v .:/data -e EZSP_DEVICE='/dev/ttyUSB1' -it walthowd/husbzb-firmware bash
+docker run --device=/dev/ttyUSB1:/dev/ttyUSB1 -v .:/data -e EZSP_DEVICE='/dev/ttyUSB1' -e LANG='C.UTF-8' -it walthowd/husbzb-firmware bash
 bellows info
 bellows restore --i-understand-i-can-update-eui64-only-once-and-i-still-want-to-do-it -B /data/bellows-backup.txt
 bellows info
