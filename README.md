@@ -5,7 +5,7 @@ Nortek GoControl HUSBZB-1 Firmware updater image.
 
 This docker image provides an environment to update the firmware from the shipped 5.4.1-194 (or other) to the latest publicly available image from SiLabs (6.6.3) or any other included version. Please PR any other known working versions.
 
-**Please note** that as of June 2020, only the 5.x releases have been fully tested as working with zigpy/bellows and Zigbee 3.0 devices. 
+**Please note** that as of September 2020, the 6.x releases and higher will require Home Assistant 0.115 or higher. 
 
 ## To use:
 `docker run --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware`
@@ -71,6 +71,12 @@ bellows restore --i-understand-i-can-update-eui64-only-once-and-i-still-want-to-
 bellows info
 ```
 On subsequent `bellows info` runs check that the EUI64 matches your backup, that the PANID matches and that the trustCenterLongAddress addresses matches. If they do not match, re-run the `bellows restore` as `bellows restore -f -B /data/bellows-backup.txt` (Omitting the `--i-understand-i-can-update-eui64-only-once-and-i-still-want-to-do-it`)
+
+### Selecting the correct firmware file
+
+For integration with bellows/zigpy you will want the `ncp-uart-sw-6.6.5.ebl` image. This provides EZSP v7 support. Please note that the EM3581 has been deprecated by SiLabs and support has been dropped in future releases of EmberZNet. 
+
+As of September 2020, hardware flow control is not supported by bellows/zigpy. Don't flash any of the images in the `hw-flow-control` folder unless you know what you are doing. 
 
 ### HUSBZB-1 Firmware Recovery
 
