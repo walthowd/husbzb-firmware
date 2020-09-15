@@ -1,11 +1,12 @@
 # husbzb-firmware
 
+Zigbee coordinator firmware updater image for Nortek GoControl QuickStick Combo Model HUSBZB-1 (Z-Wave & Zigbee USB Adapter)
 
-Nortek GoControl HUSBZB-1 Firmware updater image. 
+This docker image provides an environment to update the EmberZNet NCP application firmware from the older version 5.4.1-194 (or other old versions) that is shipped with the adapter to the latest publicly available EmberZNet NCP application firmware from Silicon Labs (6.6.5) or any other included version. 
 
-This docker image provides an environment to update the firmware from the shipped 5.4.1-194 (or other) to the latest publicly available image from SiLabs (6.6.3) or any other included version. Please PR any other known working versions.
+Please submit a pull request to this GitHub reposotory with any other known working versions (older and newer).
 
-**Please note** that as of September 2020, the 6.x releases and higher will require Home Assistant 0.115 or higher. 
+**Note!** Please understand that as of September 2020, the 6.x.x releases and higher of SiLabs EmberZNet will require Home Assistant 0.115 or higher. 
 
 ## To use:
 `docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware`
