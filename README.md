@@ -1,20 +1,21 @@
 # husbzb-firmware
 
+Zigbee coordinator firmware updater image for Nortek GoControl QuickStick Combo Model HUSBZB-1 (Z-Wave & Zigbee USB Adapter)
 
-Nortek GoControl HUSBZB-1 Firmware updater image. 
+This docker image provides an environment to update the EmberZNet NCP application firmware from the base version 5.4.1-194 (or any other version) that is shipped with the adapter to the latest publicly available EmberZNet NCP application firmware from Silicon Labs (6.6.5) or any other included version. 
 
-This docker image provides an environment to update the firmware from the shipped 5.4.1-194 (or other) to the latest publicly available image from SiLabs (6.6.3) or any other included version. Please PR any other known working versions.
+Please submit a pull request to this GitHub repository with any other known working versions (older and newer).
 
-**Please note** that as of September 2020, the 6.x releases and higher will require Home Assistant 0.115 or higher. 
+**Note!** Please understand that as of September 2020, the 6.x.x releases and higher of SiLabs EmberZNet will require Home Assistant 0.115 or higher. 
 
 ## To use:
-`docker run --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware`
+`docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware`
 
 Replace */dev/ttyUSB1* with the path to the zigbee side of your USB stick. Make sure that nothing else is currently using the port (i.e. Shutdown and stop Home Assistant)
 
 Example output, currently just a scan reporting current FW version: 
 ```
-docker run --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware
+docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware
 {"ports": [{"stackVersion": "5.4.1-194", "deviceType": "zigbee", "pid": "8A2A", "port": "/dev/ttyUSB1", "vid": "10C4"}]}
 Found zigbee port at /dev/ttyUSB1 running 5.4.1-194
 ```
@@ -25,7 +26,7 @@ If you want to use this image to manually update your firmware first shut down H
 Then start a shell from the docker image:
 
 ```
-docker run --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware bash
+docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware bash
 ```
 Make sure you are in */tmp/silabs* by changing directory and then flash:
 ```
@@ -57,7 +58,7 @@ NOTE: This is currently in testing mode.
 
 To backup your existing configration:
 ```
-docker run --device=/dev/ttyUSB1:/dev/ttyUSB1 -v .:/data -e EZSP_DEVICE='/dev/ttyUSB1' -e LANG='C.UTF-8' -it walthowd/husbzb-firmware bash
+docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -v .:/data -e EZSP_DEVICE='/dev/ttyUSB1' -e LANG='C.UTF-8' -it walthowd/husbzb-firmware bash
 bellows info
 bellows backup > /data/bellows-backup.txt
 exit
@@ -65,7 +66,7 @@ exit
 
 Remove old stick, insert new stick (find correct ttyUSB port in `dmesg`) and restart container:
 ```
-docker run --device=/dev/ttyUSB1:/dev/ttyUSB1 -v .:/data -e EZSP_DEVICE='/dev/ttyUSB1' -e LANG='C.UTF-8' -it walthowd/husbzb-firmware bash
+docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -v .:/data -e EZSP_DEVICE='/dev/ttyUSB1' -e LANG='C.UTF-8' -it walthowd/husbzb-firmware bash
 bellows info
 bellows restore --i-understand-i-can-update-eui64-only-once-and-i-still-want-to-do-it -B /data/bellows-backup.txt
 bellows info
