@@ -1,4 +1,7 @@
 FROM ubuntu:18.04 
+
+COPY qemu-arm-static /usr/bin
+
 MAINTAINER Walt Howd <walthowd@gmail.com>
 
 WORKDIR /tmp/silabs
