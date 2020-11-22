@@ -31,7 +31,7 @@ docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware 
 Make sure you are in */tmp/silabs* by changing directory and then flash:
 ```
 cd /tmp/silabs
-./ncp.py flash -p /dev/ttyUSB1 -f ncp-uart-sw-6.6.3.ebl 
+./ncp.py flash -p /dev/ttyUSB1 -f ncp-uart-sw-6.6.5.ebl 
 Restarting NCP into Bootloader mode...
 CEL stick
 EM3581 Serial Bootloader v5.4.1.0 b962
@@ -44,7 +44,7 @@ Wait for the stick to reboot, then run *ncp.py* again to verify upgrade
 ```
 ./ncp.py scan
 Connecting to.. /dev/ttyUSB1 57600 True False 
-{"ports": [{"stackVersion": "6.6.3-151", "deviceType": "zigbee", "pid": "8A2A", "port": "/dev/ttyUSB1", "vid": "10C4"}]}
+{"ports": [{"stackVersion": "6.6.5-204", "deviceType": "zigbee", "pid": "8A2A", "port": "/dev/ttyUSB1", "vid": "10C4"}]}
 ```
 
 ### Coordinator migration
