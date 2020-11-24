@@ -1,6 +1,6 @@
 # husbzb-firmware
 
-Zigbee coordinator firmware updater image for Nortek GoControl QuickStick Combo Model HUSBZB-1 (Z-Wave & Zigbee USB Adapter)
+Zigbee coordinator firmware updater image for Nortek GoControl QuickStick Combo Model HUSBZB-1 (Z-Wave & Zigbee USB Adapter) and Telegesis ETRX357USB adapter. 
 
 This docker image provides an environment to update the EmberZNet NCP application firmware from the base version 5.4.1-194 (or any other version) that is shipped with the adapter to the latest publicly available EmberZNet NCP application firmware from Silicon Labs (6.6.5) or any other included version. 
 
@@ -20,6 +20,14 @@ docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware
 Found zigbee port at /dev/ttyUSB1 running 5.4.1-194
 ```
 
+### Selecting the correct firmware file
+
+For Nortek GoControl QuickStick Combo Model HUSBZB-1 and integration with bellows/zigpy you will want the `ncp-uart-sw-6.6.5.ebl` image. This provides EZSP v7 support. Please note that the EM3581 has been deprecated by SiLabs and support has been dropped in future releases of EmberZNet. 
+
+For Telegesis ETRX357USB adapter and integration with bellows/zigpy you will want the `em357-v665-ncp-uart-sw.ebl` image.
+
+As of September 2020, hardware flow control is not supported by bellows/zigpy. Don't flash any of the images in the `hw-flow-control` folder unless you know what you are doing. 
+
 ### Manual firmware update procedure
 If you want to use this image to manually update your firmware first shut down Home Assistant, or any other program accessing the port.
 
@@ -31,7 +39,7 @@ docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware 
 Make sure you are in */tmp/silabs* by changing directory and then flash:
 ```
 cd /tmp/silabs
-./ncp.py flash -p /dev/ttyUSB1 -f ncp-uart-sw-6.6.3.ebl 
+./ncp.py flash -p /dev/ttyUSB1 -f ncp-uart-sw-6.6.5.ebl 
 Restarting NCP into Bootloader mode...
 CEL stick
 EM3581 Serial Bootloader v5.4.1.0 b962
@@ -44,7 +52,7 @@ Wait for the stick to reboot, then run *ncp.py* again to verify upgrade
 ```
 ./ncp.py scan
 Connecting to.. /dev/ttyUSB1 57600 True False 
-{"ports": [{"stackVersion": "6.6.3-151", "deviceType": "zigbee", "pid": "8A2A", "port": "/dev/ttyUSB1", "vid": "10C4"}]}
+{"ports": [{"stackVersion": "6.6.5-204", "deviceType": "zigbee", "pid": "8A2A", "port": "/dev/ttyUSB1", "vid": "10C4"}]}
 ```
 
 ### Coordinator migration
@@ -72,12 +80,6 @@ bellows restore --i-understand-i-can-update-eui64-only-once-and-i-still-want-to-
 bellows info
 ```
 On subsequent `bellows info` runs check that the EUI64 matches your backup, that the PANID matches and that the trustCenterLongAddress addresses matches. If they do not match, re-run the `bellows restore` as `bellows restore -f -B /data/bellows-backup.txt` (Omitting the `--i-understand-i-can-update-eui64-only-once-and-i-still-want-to-do-it`)
-
-### Selecting the correct firmware file
-
-For integration with bellows/zigpy you will want the `ncp-uart-sw-6.6.5.ebl` image. This provides EZSP v7 support. Please note that the EM3581 has been deprecated by SiLabs and support has been dropped in future releases of EmberZNet. 
-
-As of September 2020, hardware flow control is not supported by bellows/zigpy. Don't flash any of the images in the `hw-flow-control` folder unless you know what you are doing. 
 
 ### HUSBZB-1 Firmware Recovery
 
