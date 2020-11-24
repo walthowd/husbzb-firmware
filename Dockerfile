@@ -1,15 +1,11 @@
-FROM ubuntu:18.04 
-
-COPY qemu-arm-static /usr/bin
+FROM ubuntu:20.04 
 
 MAINTAINER Walt Howd <walthowd@gmail.com>
 
 WORKDIR /tmp/silabs
 
 RUN apt-get update \
-  && apt-get install -y git wget python-pip python3-pip unzip jq
-
-RUN pip install xmodem pyserial
+  && apt-get install -y git wget python3-pip unzip jq
 
 RUN pip3 install --upgrade git+git://github.com/zigpy/bellows.git
 

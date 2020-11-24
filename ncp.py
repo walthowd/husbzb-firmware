@@ -31,6 +31,9 @@ CEL_VID = '10C4'
 #CEL_PID = '8A5E'
 # Nortek/GoControl HUSBZB-1
 CEL_PID = '8A2A'
+# Telegesis ETRX357USB
+ETRX_VID = '10C4'
+ETRX_PID = '8293'
 CEL_BAUD = 57600
 CEL_XON_XOFF = True
 CEL_RTS_CTS = False
@@ -238,6 +241,13 @@ def flash(port, file):
             # Check if CEL EM3588 USB stick
             if vid == CEL_VID and pid == CEL_PID:
                 print 'CEL stick'
+                BAUD = CEL_BAUD
+                XON_XOFF = CEL_XON_XOFF
+                RTS_CTS = CEL_RTS_CTS
+                break
+            # Check if ETRX357 USB stick
+            if vid == ETRX_VID and pid == ETRX_PID:
+                print 'ETRX stick'
                 BAUD = CEL_BAUD
                 XON_XOFF = CEL_XON_XOFF
                 RTS_CTS = CEL_RTS_CTS
