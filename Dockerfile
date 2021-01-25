@@ -9,7 +9,7 @@ RUN apt-get update \
 
 RUN pip3 install --upgrade git+git://github.com/zigpy/bellows.git
 
-RUN curl https://bootstrap.pypa.io/get-pip.py --output /tmp/get-pip.py
+RUN curl https://bootstrap.pypa.io/2.7/get-pip.py --output /tmp/get-pip.py
 
 RUN python2 /tmp/get-pip.py
 
