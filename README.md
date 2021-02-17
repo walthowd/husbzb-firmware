@@ -24,7 +24,7 @@ Found zigbee port at /dev/ttyUSB1 running 5.4.1-194
 
 For Nortek GoControl QuickStick Combo Model HUSBZB-1 and integration with bellows/zigpy you will want the `ncp-uart-sw-6.7.8.ebl` image. This provides EZSP v8 support. Please note that the EM3581 has been deprecated by SiLabs and support has been dropped in future releases of EmberZNet. 
 
-For Telegesis ETRX357USB adapter and integration with bellows/zigpy you will want the `em357-v665-ncp-uart-sw.ebl` image.
+For Telegesis ETRX357USB adapter and integration with bellows/zigpy you will want the `em357-v678-ncp-uart-sw.ebl` image.
 
 As of September 2020, hardware flow control is not supported by bellows/zigpy. Don't flash any of the images in the `hw-flow-control` folder unless you know what you are doing. 
 
@@ -121,3 +121,9 @@ An example of the process using minicom:
 * Choose 1. and the stick will start waiting for you to send the firmware (you will see multiple `Cs` written in the screen)
 * Now type `Ctrl+A Z` to open the menu and select S (for sending the file). Write down the full path of the ebs file (ex: `/tmp/silabs/ncp-uart-sw-6.6.5.ebl` and hit enter. 
 * Once the file has been completely sent (it can take a while), the process is done
+
+### Credits
+
+Many thanks to Gary for providing updated firmware files. See his repository here:
+
+https://github.com/grobasoz/zigbee-firmware
