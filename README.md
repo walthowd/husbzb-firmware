@@ -2,7 +2,7 @@
 
 Zigbee coordinator firmware updater image for Nortek GoControl QuickStick Combo Model HUSBZB-1 (Z-Wave & Zigbee USB Adapter) and Telegesis ETRX357USB adapter. 
 
-This docker image provides an environment to update the EmberZNet NCP application firmware from the base version 5.4.1-194 (or any other version) that is shipped with the adapter to the latest publicly available EmberZNet NCP application firmware from Silicon Labs (6.6.5) or any other included version. 
+This docker image provides an environment to update the EmberZNet NCP application firmware from the base version 5.4.1-194 (or any other version) that is shipped with the adapter to the latest publicly available EmberZNet NCP application firmware from Silicon Labs (6.7.8) or any other included version. 
 
 Please submit a pull request to this GitHub repository with any other known working versions (older and newer).
 
@@ -22,7 +22,7 @@ Found zigbee port at /dev/ttyUSB1 running 5.4.1-194
 
 ### Selecting the correct firmware file
 
-For Nortek GoControl QuickStick Combo Model HUSBZB-1 and integration with bellows/zigpy you will want the `ncp-uart-sw-6.6.5.ebl` image. This provides EZSP v7 support. Please note that the EM3581 has been deprecated by SiLabs and support has been dropped in future releases of EmberZNet. 
+For Nortek GoControl QuickStick Combo Model HUSBZB-1 and integration with bellows/zigpy you will want the `ncp-uart-sw-6.7.8.ebl` image. This provides EZSP v8 support. Please note that the EM3581 has been deprecated by SiLabs and support has been dropped in future releases of EmberZNet. 
 
 For Telegesis ETRX357USB adapter and integration with bellows/zigpy you will want the `em357-v665-ncp-uart-sw.ebl` image.
 
@@ -39,7 +39,7 @@ docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware 
 Make sure you are in */tmp/silabs* by changing directory and then flash:
 ```
 cd /tmp/silabs
-./ncp.py flash -p /dev/ttyUSB1 -f ncp-uart-sw-6.6.5.ebl 
+./ncp.py flash -p /dev/ttyUSB1 -f ncp-uart-sw-6.7.8.ebl
 Restarting NCP into Bootloader mode...
 CEL stick
 EM3581 Serial Bootloader v5.4.1.0 b962
@@ -52,7 +52,7 @@ Wait for the stick to reboot, then run *ncp.py* again to verify upgrade
 ```
 ./ncp.py scan
 Connecting to.. /dev/ttyUSB1 57600 True False 
-{"ports": [{"stackVersion": "6.6.5-204", "deviceType": "zigbee", "pid": "8A2A", "port": "/dev/ttyUSB1", "vid": "10C4"}]}
+{"ports": [{"stackVersion": "6.7.8-204", "deviceType": "zigbee", "pid": "8A2A", "port": "/dev/ttyUSB1", "vid": "10C4"}]}
 ```
 
 ### Coordinator migration
