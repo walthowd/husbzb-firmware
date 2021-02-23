@@ -1,0 +1,20 @@
+FROM arm32v7/ubuntu:20.04
+MAINTAINER Walt Howd <walthowd@gmail.com>
+
+WORKDIR /tmp/silabs
+
+RUN apt-get update \
+  && apt-get install -y git wget python2 unzip jq
+
+RUN wget https://bootstrap.pypa.io/2.7/get-pip.py --output-document=get-pip.py
+RUN python2 get-pip.py
+
+RUN pip install xmodem pyserial
+
+RUN mkdir -p /tmp/silabs
+
+ADD update-firmware.sh /tmp/silabs
+ADD ncp.py /tmp/silabs
+ADD *.ebl /tmp/silabs/
+
+CMD /tmp/silabs/update-firmware.sh
