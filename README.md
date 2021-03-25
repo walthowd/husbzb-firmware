@@ -1,17 +1,19 @@
 # husbzb-firmware
 
-Zigbee coordinator firmware updater image for Nortek GoControl QuickStick Combo Model HUSBZB-1 (Z-Wave & Zigbee USB Adapter) and Telegesis ETRX357USB adapter. 
+Zigbee coordinator firmware updater image for upgrading firmware on Nortek GoControl QuickStick Combo Model HUSBZB-1 (Zigbee & Z-Wave USB Adapter) and Telegesis ETRX357USB adapters, as well as possibly other Zigbee adapters based on similar EM358x/EM3581 and ETRX35x/ETRX357 MCU chips from Silicon Labs.
 
 This docker image provides an environment to update the EmberZNet NCP application firmware from the base version 5.4.1-194 (or any other version) that is shipped with the adapter to the latest publicly available EmberZNet NCP application firmware from Silicon Labs (6.7.8) or any other included version. 
 
 Please submit a pull request to this GitHub repository with any other known working versions (older and newer).
 
-**Note!** Please understand that as of September 2020, the 6.x.x releases and higher of SiLabs EmberZNet will require Home Assistant 0.115 or higher. 
+The main goal with this firmware updater image is to help users upgrade to a newer firmware image with EZSP v8 (EmberZNet Serial Protocol version 8) interface support to make them compatible with the Zigbee implementations in home automation software like Home Assistant (ZHA integration), Zigbee2MQTT (dev/pre-alpha), IoBroker (dev/pre-alpha), and Jeedom (beta zigpy based Zigbee plugin).
+
+**Note!** Please understand that as of September 2020, the 6.x.x releases and higher of Silabs EmberZNet will require at least Home Assistant 0.115 or later. 
 
 ## To use:
 `docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware`
 
-Replace */dev/ttyUSB1* with the path to the zigbee side of your USB stick. Make sure that nothing else is currently using the port (i.e. Shutdown and stop Home Assistant)
+Replace */dev/ttyUSB1* with the path to the zigbee side of your USB stick. Make sure that nothing else is currently using the port (i.e. Shutdown and stop any application that is accessing the Zigbee MCU chip or any other programs that is connected to that serial cominication port, such as example Home Assistant, Zigbee2MQTT, IoBroker, or Jeedom).
 
 Example output, currently just a scan reporting current FW version: 
 ```
@@ -31,7 +33,7 @@ For Telegesis ETRX357USB adapter and integration with bellows/zigpy you will wan
 As of September 2020, hardware flow control is not supported by bellows/zigpy. Don't flash any of the images in the `hw-flow-control` folder unless you know what you are doing. 
 
 ### Manual firmware update procedure
-If you want to use this image to manually update your firmware first shut down Home Assistant, or any other program accessing the port.
+If you want to use this image to manually update your firmware first shut down any application that is accessing the Zigbee MCU (such as example Home Assistant, Zigbee2MQTT, IoBroker, Jeedom, or any other programs that is connected to that serial cominication port).
 
 Then start a shell from the docker image:
 
