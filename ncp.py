@@ -26,23 +26,33 @@ ERROR_NCP_WRONG_EZSP_VERSION = -2
 
 BOOTLOADER_INIT_TIMEOUT = 10
 
-# Silicon Labs CEL EM3588 USB Stick
-CEL_VID = '10C4'
-#CEL_PID = '8A5E'
 # Nortek/GoControl HUSBZB-1
+CEL_VID = '10C4'
 CEL_PID = '8A2A'
-# Telegesis ETRX357USB
-ETRX_VID = '10C4'
-ETRX_PID = '8293'
 CEL_BAUD = 57600
 CEL_XON_XOFF = True
 CEL_RTS_CTS = False
+
+# Telegesis ETRX357USB
+ETRX_VID = '10C4'
+ETRX_PID = '8293'
+ETRX_BAUD = 57600
+ETRX_XON_XOFF = True
+ETRX_RTS_CTS = False
+
 # Silicon Labs WSTK (J-Link Pro OB)
 WSTK_VID = '10C4'
 WSTK_PID = 'EA60'
 WSTK_BAUD = 115200
 WSTK_XON_XOFF = False
 WSTK_RTS_CTS = True
+
+# ITEAD/SONOFF EFR32 USB Stick
+SONOFF_VID = '1A86'
+SONOFF_PID = '7523'
+SONOFF_BAUD = 115200
+SONOFF_XON_XOFF = True
+SONOFF_RTS_CTS = False
 
 def is_valid_file(parser, arg):
     if not os.path.isfile(arg):
@@ -232,7 +242,7 @@ def flash(port, file):
     BAUD = 57600;
     XON_XOFF = True;
     RTS_CTS = False;
-    # Check CEL or WSTK
+    # Check stick type
     for p in serial.tools.list_ports.comports():
         if p[0] == port:
             # Parse out VID and PID
@@ -248,10 +258,17 @@ def flash(port, file):
             # Check if ETRX357 USB stick
             if vid == ETRX_VID and pid == ETRX_PID:
                 print 'ETRX stick'
-                BAUD = CEL_BAUD
-                XON_XOFF = CEL_XON_XOFF
-                RTS_CTS = CEL_RTS_CTS
+                BAUD = ETRX_BAUD
+                XON_XOFF = ETRX_XON_XOFF
+                RTS_CTS = ETRX_RTS_CTS
                 break
+            # Check if SONOFF  stick
+            if vid == SONOFF_VID and pid == SONOFF_PID:
+                print 'SONOFF stick'
+                BAUD = SONOFF_BAUD
+                XON_XOFF = SONOFF_XON_XOFF
+                RTS_CTS = SONOFF_RTS_CTS
+                break                
             # Check if WSTK board
             if vid == WSTK_VID and pid == WSTK_PID:
                 print 'WSTK board'
@@ -370,7 +387,7 @@ def scan():
             portjson['pid'] = pid
 
             # Check which USB NCP device
-            if vid == CEL_VID and pid == CEL_PID or vid == WSTK_VID and pid == WSTK_PID or vid == ETRX_VID and pid == ETRX_PID or vid == CP201x_VID and pid == CP201x_PID:
+            if vid == CEL_VID and pid == CEL_PID or vid == WSTK_VID and pid == WSTK_PID or vid == ETRX_VID and pid == ETRX_PID or vid == SONOFF_VID and pid == SONOFF_PID:
                 # Use EM3588 USB stick as default
                 BAUD = CEL_BAUD
                 XON_XOFF = CEL_XON_XOFF
@@ -380,7 +397,12 @@ def scan():
                     BAUD = WSTK_BAUD
                     XON_XOFF = WSTK_XON_XOFF
                     RTS_CTS = WSTK_RTS_CTS
-
+                # Check if SONOFF board
+                if vid == SONOFF_VID and pid == SONOFF_PID:
+                    BAUD = SONOFF_BAUD
+                    XON_XOFF = SONOFF_XON_XOFF
+                    RTS_CTS = SONOFF_RTS_CTS
+                    
                 sys.stderr.write('Connecting to.. %s %s %s %s \n' % (port[0], BAUD, XON_XOFF, RTS_CTS));
 
                 # Init serial port
