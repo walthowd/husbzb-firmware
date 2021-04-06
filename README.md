@@ -123,8 +123,9 @@ An example of the process using minicom:
    BL > 
    ```
 * Choose 1. and the stick will start waiting for you to send the firmware (you will see multiple `Cs` written in the screen)
-* Now type `Ctrl+A Z` to open the menu and select S (for sending the file). Write down the full path of the ebs file (ex: `/tmp/silabs/ncp-uart-sw-6.6.5.ebl` and hit enter. 
+* Now type `Ctrl+A Z` to open the menu and select S (for sending the file). Choose `xmodem` and then navigate to the file, select it using spacebar and hit enter. In case it prompts you for the file name instead, write down the full path of the ebl file (ex: `/tmp/silabs/ncp-uart-sw-6.6.5.ebl` and hit enter. 
 * Once the file has been completely sent (it can take a while), the process is done
+* Press enter to get back to the menu and now you can select `2` which will boot the new firmware and then just exit minicom using `Ctrl+A Z X`
 
 ### Credits
 
