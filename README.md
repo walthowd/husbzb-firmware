@@ -1,6 +1,6 @@
 # husbzb-firmware
 
-Zigbee coordinator firmware updater image for upgrading firmware on Nortek GoControl QuickStick Combo Model HUSBZB-1 (Zigbee & Z-Wave USB Adapter) and Telegesis ETRX357USB adapters, as well as possibly other Zigbee adapters based on similar EM358x/EM3581 and ETRX35x/ETRX357 MCU chips from Silicon Labs.
+Zigbee coordinator firmware updater image for upgrading firmware on Nortek GoControl QuickStick Combo Model HUSBZB-1 (Zigbee & Z-Wave USB Adapter) and Telegesis ETRX357USB adapters, as well as possibly other Zigbee adapters based on similar EM358x/EM3581, ETRX35x/ETRX357, and EFR32MGxx MCU chips from Silicon Labs.
 
 This docker image provides an environment to update the EmberZNet NCP application firmware from the base version 5.4.1-194 (or any other version) that is shipped with the adapter to the latest publicly available EmberZNet NCP application firmware from Silicon Labs (6.7.8) or any other included version. 
 
