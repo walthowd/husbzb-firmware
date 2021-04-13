@@ -2,11 +2,11 @@
 
 Zigbee coordinator firmware updater image for upgrading firmware on Nortek GoControl QuickStick Combo Model HUSBZB-1 (Zigbee & Z-Wave USB Adapter) and Telegesis ETRX357USB adapters, as well as possibly other Zigbee adapters based on similar EM358x/EM3581, ETRX35x/ETRX357, and EFR32MGxx MCU chips from Silicon Labs.
 
-This docker image provides an environment to update the EmberZNet NCP application firmware from the base version 5.4.1-194 (or any other version) that is shipped with the adapter to the latest publicly available EmberZNet NCP application firmware from Silicon Labs (6.7.8) or any other included version. 
+This docker image provides an environment to update the EmberZNet NCP application firmware from the base version 5.4.1-194 (or any later version) that is shipped with the adapter to the latest publicly available EmberZNet NCP application firmware from Silicon Labs (6.7.8) or future newer versions. 
 
 Please submit a pull request to this GitHub repository with any other known working versions (older and newer).
 
-The main goal with this firmware updater image is to help users upgrade to a newer firmware image with EZSP v8 (EmberZNet Serial Protocol version 8) interface support to make them compatible with the Zigbee implementations in home automation software like Home Assistant (ZHA integration), Zigbee2MQTT (dev/pre-alpha), IoBroker (dev/pre-alpha), and Jeedom (beta zigpy based Zigbee plugin).
+The main goal with this firmware updater image is to help users upgrade to a newer firmware image with EZSP v8 (EmberZNet Serial Protocol version 8) interface support to make them compatible with the Zigbee implementations in home automation software like Home Assistant (ZHA integration), OpenHAB, Zigbee2MQTT (dev/pre-alpha), IoBroker (dev/pre-alpha), and Jeedom (beta zigpy based Zigbee plugin).
 
 **Note!** Please understand that as of September 2020, the 6.x.x releases and higher of Silabs EmberZNet will require at least Home Assistant 0.115 or later. 
 
