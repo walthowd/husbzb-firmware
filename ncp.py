@@ -1,4 +1,7 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
+
+from __future__ import print_function, unicode_literals
+
 __author__ = 'miwebb ehasdar'
 
 # Reference URLS for EZSP and ASH protocol
@@ -90,8 +93,8 @@ def trans(s):
     seq = randSeqUpTo(len(s))
     out = []
     for i in range(len(s)):
-        out.append(ord(s[i]) ^ seq[i])
-    return out
+        out.append(s[i] ^ seq[i])
+    return bytes(out)
 
 def ezspV4Init(ser):
     #flush input buffer
@@ -236,12 +239,12 @@ def flash(port, file):
         ser.write(data)
         time.sleep(0.001)
 
-    print 'Restarting NCP into Bootloader mode...'
+    print('Restarting NCP into Bootloader mode...')
 
     # Default port settings
-    BAUD = 57600;
-    XON_XOFF = True;
-    RTS_CTS = False;
+    BAUD = 57600
+    XON_XOFF = True
+    RTS_CTS = False
     # Check stick type
     for p in serial.tools.list_ports.comports():
         if p[0] == port:
@@ -250,28 +253,28 @@ def flash(port, file):
             pid = p[2].split('PID=')[1].split(':')[1][0:4]
             # Check if CEL EM3588 USB stick
             if vid == CEL_VID and pid == CEL_PID:
-                print 'CEL stick'
+                print('CEL stick')
                 BAUD = CEL_BAUD
                 XON_XOFF = CEL_XON_XOFF
                 RTS_CTS = CEL_RTS_CTS
                 break
             # Check if ETRX357 USB stick
             if vid == ETRX_VID and pid == ETRX_PID:
-                print 'ETRX stick'
+                print('ETRX stick')
                 BAUD = ETRX_BAUD
                 XON_XOFF = ETRX_XON_XOFF
                 RTS_CTS = ETRX_RTS_CTS
                 break
             # Check if SONOFF  stick
             if vid == SONOFF_VID and pid == SONOFF_PID:
-                print 'SONOFF stick'
+                print('SONOFF stick')
                 BAUD = SONOFF_BAUD
                 XON_XOFF = SONOFF_XON_XOFF
                 RTS_CTS = SONOFF_RTS_CTS
                 break                
             # Check if WSTK board
             if vid == WSTK_VID and pid == WSTK_PID:
-                print 'WSTK board'
+                print('WSTK board')
                 BAUD = WSTK_BAUD
                 XON_XOFF = WSTK_XON_XOFF
                 RTS_CTS = WSTK_RTS_CTS
@@ -292,7 +295,7 @@ def flash(port, file):
 
     # EZSP protocol initialization
     if ezspV8Init(ser)!=NO_ERROR and ezspV7Init(ser)!=NO_ERROR and ezspV6Init(ser)!=NO_ERROR and ezspV5Init(ser)!=NO_ERROR and ezspV4Init(ser)!=NO_ERROR:
-        print 'NCP no ZigBee Ack. Please try again.'
+        print('NCP no ZigBee Ack. Please try again.')
         sys.exit(1)
 
     #flush input buffer
@@ -320,29 +323,29 @@ def flash(port, file):
     )
 
     # Burn the prompt
-    ser.write('\x0A')
+    ser.write(b'\x0A')
     # Boot menu - legacy or Gecko bootloader?
     # Gecko  BL verion at 2nd line
     # Legacy BL verion at 3rd line
     ser.readline() # read blank line
     verBL = ser.readline() # read Gecko BTL version or blank line
-    if not ("Gecko Bootloader" in verBL):
+    if not (b"Gecko Bootloader" in verBL):
         verBL = ser.readline() # read Legacy BTL version
-    print verBL # show Bootloader version
-    if "Gecko Bootloader" in verBL and not(".gbl" in file):
-        print 'Aborted! Gecko bootloader accepts .gbl image only.'
-        print 'Please replug the USB NCP board and flash the gbl file again.'
+    print(verBL.decode('ascii')) # show Bootloader version
+    if b"Gecko Bootloader" in verBL and not(".gbl" in file):
+        print('Aborted! Gecko bootloader accepts .gbl image only.')
+        print('Please replug the USB NCP board and flash the gbl file again.')
         sys.exit(1)
-    elif "EFR32 Serial Btl" in verBL and not(".ebl" in file):
-        print 'Aborted! Legacy bootloader accepts .ebl image only.'
-        print 'Please replug the USB NCP board and flash the ebl file again.'
+    elif b"EFR32 Serial Btl" in verBL and not(".ebl" in file):
+        print('Aborted! Legacy bootloader accepts .ebl image only.')
+        print('Please replug the USB NCP board and flash the ebl file again.')
         sys.exit(1)
     else:
         ser.readline() # 1. upload gbl or ebl
         ser.readline() # 2. run
         ser.readline() # 3. ebl info
         # Enter '1' to initialize X-MODEM mode
-        ser.write('1')
+        ser.write(b'1')
         time.sleep(1)
         # Read responses
         ser.readline() # BL > 1
@@ -351,28 +354,29 @@ def flash(port, file):
         success = False
         start_time = time.time()
         while time.time()-start_time < BOOTLOADER_INIT_TIMEOUT:
-            if ser.read() == 'C':
+            if ser.read() == b'C':
                 success = True
                 break
         if not success:
-            print 'Failed to restart into bootloader mode. Please see users guide.'
+            print('Failed to restart into bootloader mode. Please see users guide.')
             sys.exit(1)
 
-    print 'Successfully restarted into bootloader mode! Starting upload of NCP image... '
+    print('Successfully restarted into bootloader mode! Starting upload of NCP image... ')
 
     # Start XMODEM transaction
     modem = XMODEM(getc, putc)
-    stream = open(file,'r')
-    sentcheck = modem.send(stream)
+    
+    with open(file, 'rb') as stream:
+        sentcheck = modem.send(stream)
 
     if sentcheck:
-        print 'Finished!'
+        print('Finished!')
     else:
-        print 'NCP upload failed. Please reload a correct NCP image to recover.'
-    print 'Rebooting NCP...'
+        print('NCP upload failed. Please reload a correct NCP image to recover.')
+    print('Rebooting NCP...')
 
     # Send Reboot into App-Code command
-    ser.write('2')
+    ser.write(b'2')
     ser.close()
 
 def scan():
@@ -403,7 +407,7 @@ def scan():
                     XON_XOFF = SONOFF_XON_XOFF
                     RTS_CTS = SONOFF_RTS_CTS
                     
-                sys.stderr.write('Connecting to.. %s %s %s %s \n' % (port[0], BAUD, XON_XOFF, RTS_CTS));
+                sys.stderr.write('Connecting to.. %s %s %s %s \n' % (port[0], BAUD, XON_XOFF, RTS_CTS))
 
                 # Init serial port
                 ser = serial.Serial(
@@ -461,18 +465,17 @@ def scan():
                         if versioninfo[5] != 0:
                             portjson['stackVersion'] += 's' + str(versioninfo[5])
                 else:
-                    sys.stderr.write('No ZigBee Ack. %s \n' % port[0]);
+                    sys.stderr.write('No ZigBee Ack. %s \n' % port[0])
                     portjson['deviceType'] = 'unknown'
                 ser.close()
             else:
-                sys.stderr.write('No Compatable USB devices found. %s %s \n' % port[0]);
+                sys.stderr.write('No Compatable USB devices found. %s %s \n' % port[0])
                 portjson['deviceType'] = 'unknown'
         except:
-            sys.stderr.write('Exception: %s %s \n' % (sys.exc_info()[0],  port[0]));
+            sys.stderr.write('Exception: %s %s \n' % (sys.exc_info()[0],  port[0]))
             portjson['deviceType'] = 'unknown'
-            pass
         outjson['ports'].append(portjson)
-    print json.dumps(outjson)
+    print(json.dumps(outjson))
 
 args = parser.parse_args()
 if args.which == 'scan':
