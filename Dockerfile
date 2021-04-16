@@ -4,16 +4,21 @@ MAINTAINER Walt Howd <walthowd@gmail.com>
 
 WORKDIR /tmp/silabs
 
+#RUN apt-get update \
+#  && apt-get install -y git wget python3-pip unzip jq curl python2.7 python2
+
 RUN apt-get update \
-  && apt-get install -y git wget python3-pip unzip jq curl python2.7 python2
+  && apt-get install -y git wget python3-pip unzip jq curl
 
 RUN pip3 install --upgrade git+git://github.com/zigpy/bellows.git
 
-RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output /tmp/get-pip.py
+RUN pip3 install pyserial xmodem
 
-RUN python2 /tmp/get-pip.py
+#RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output /tmp/get-pip.py
 
-RUN pip2 install xmodem pyserial
+#RUN python2 /tmp/get-pip.py
+
+#RUN pip2 install xmodem pyserial
 
 RUN mkdir -p /tmp/silabs
 
