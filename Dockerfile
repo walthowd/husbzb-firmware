@@ -1,4 +1,5 @@
-FROM ubuntu:20.04 
+#FROM ubuntu:20.04 
+FROM python:buster
 
 MAINTAINER Walt Howd <walthowd@gmail.com>
 
