@@ -11,38 +11,58 @@ The main goal with this firmware updater image is to help users upgrade to a new
 **Note!** Please understand that as of September 2020, the 6.x.x releases and higher of Silabs EmberZNet will require at least Home Assistant 0.115 or later. 
 
 ## To use:
-`docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware`
+
+You can either run via docker, or clone this repository and run on any system with a somewhat recent version of Python. 
+
+### Run via Docker
+
+Start a docker shell. 
+
+`docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware bash`
 
 Replace */dev/ttyUSB1* with the path to the zigbee side of your USB stick. Make sure that nothing else is currently using the port (i.e. Shutdown and stop any application that is accessing the Zigbee MCU chip or any other programs that is connected to that serial cominication port, such as example Home Assistant, Zigbee2MQTT, IoBroker, or Jeedom).
 
-Example output, currently just a scan reporting current FW version: 
+From inside the container, run ncp.py to detect your USB stick and report current firmware version. 
 ```
-docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware
+root@8b763a33a0d5:/tmp/silabs#./ncp.py scan
+{"ports": [{"stackVersion": "5.4.1-194", "deviceType": "zigbee", "pid": "8A2A", "port": "/dev/ttyUSB1", "vid": "10C4"}]}
+Found zigbee port at /dev/ttyUSB1 running 5.4.1-194
+```
+
+### Run via python directly
+
+Clone repository.
+
+`git clone https://github.com/walthowd/husbzb-firmware.git && cd husbzb-firmware`
+
+Run a scan (`./ncp.py scan`) to identify your USB stick and current firmware version
+
+```
+#./ncp.py scan
 {"ports": [{"stackVersion": "5.4.1-194", "deviceType": "zigbee", "pid": "8A2A", "port": "/dev/ttyUSB1", "vid": "10C4"}]}
 Found zigbee port at /dev/ttyUSB1 running 5.4.1-194
 ```
 
 ### Selecting the correct firmware file
 
-For Nortek GoControl QuickStick Combo Model HUSBZB-1 and integration with bellows/zigpy you will want the `ncp-uart-sw-6.7.8.ebl` image. This provides EZSP v8 support. Please note that the EM3581 has been deprecated by SiLabs and support has been dropped in future releases of EmberZNet. 
+| Adapter                                         | Recommended Firmware       |
+|-------------------------------------------------|----------------------------|
+| Nortek GoControl QuickStick Combo Model HUSBZB-1 | ncp-uart-sw-6.7.8.ebl      |
+| Telegesis ETRX357USB adapter                    | em357-v678-ncp-uart-sw.ebl |
 
 For advanced users - An alternative 115200 bps firmware image is available for HUSBZB-1, `ncp-uart-sw-6.7.8-115k.ebl`. This provides a faster pathway to the adapter but requires that new Home Assistant user manually input the serial path, radio type (EZSP) and bauddate when adding ZHA. Existing Home Assistant users will have to backup and edit the `.storage/.core.config_entries` file and update the listed baud rate.
 
-For Telegesis ETRX357USB adapter and integration with bellows/zigpy you will want the `em357-v678-ncp-uart-sw.ebl` image.
-
-As of September 2020, hardware flow control is not supported by bellows/zigpy. Don't flash any of the images in the `hw-flow-control` folder unless you know what you are doing. 
+As of March 2021, hardware flow control has been added to bellows/zigpy - Only flash any of the images in the `hw-flow-control` folder unless you know what you are doing. 
 
 ### Manual firmware update procedure
 If you want to use this image to manually update your firmware first shut down any application that is accessing the Zigbee MCU (such as example Home Assistant, Zigbee2MQTT, IoBroker, Jeedom, or any other programs that is connected to that serial cominication port).
 
-Then start a shell from the docker image:
+Then start a shell from the docker image or enter the directory you cloned from [the above section](https://github.com/walthowd/husbzb-firmware#to-use). 
 
+Syntax is `./ncp.py flash -p /dev/path/to/your/stick -f correct-firmware.ebl`
+
+Example:
 ```
-docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -it walthowd/husbzb-firmware bash
-```
-Make sure you are in */tmp/silabs* by changing directory and then flash:
-```
-cd /tmp/silabs
 ./ncp.py flash -p /dev/ttyUSB1 -f ncp-uart-sw-6.7.8.ebl
 Restarting NCP into Bootloader mode...
 CEL stick
@@ -70,7 +90,7 @@ NOTE: This is currently in testing mode.
 
 To backup your existing configration:
 ```
-docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -v .:/data -e EZSP_DEVICE='/dev/ttyUSB1' -e LANG='C.UTF-8' -it walthowd/husbzb-firmware bash
+docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -v `pwd`:/data -e EZSP_DEVICE='/dev/ttyUSB1' -e LANG='C.UTF-8' -it walthowd/husbzb-firmware bash
 bellows info
 bellows backup > /data/bellows-backup.txt
 exit
@@ -78,7 +98,7 @@ exit
 
 Remove old stick, insert new stick (find correct ttyUSB port in `dmesg`) and restart container:
 ```
-docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -v .:/data -e EZSP_DEVICE='/dev/ttyUSB1' -e LANG='C.UTF-8' -it walthowd/husbzb-firmware bash
+docker run --rm --device=/dev/ttyUSB1:/dev/ttyUSB1 -v `pwd`:/data -e EZSP_DEVICE='/dev/ttyUSB1' -e LANG='C.UTF-8' -it walthowd/husbzb-firmware bash
 bellows info
 bellows restore --i-understand-i-can-update-eui64-only-once-and-i-still-want-to-do-it -B /data/bellows-backup.txt
 bellows info
