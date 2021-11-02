@@ -50,7 +50,19 @@ Found zigbee port at /dev/ttyUSB1 running 5.4.1-194
 | Nortek GoControl QuickStick Combo Model HUSBZB-1 | ncp-uart-sw-6.7.8.ebl      |
 | Telegesis ETRX357USB adapter                    | em357-v678-ncp-uart-sw.ebl |
 
-For advanced users - An alternative 115200 bps firmware image is available for HUSBZB-1, `ncp-uart-sw-6.7.8-115k.ebl`. This provides a faster pathway to the adapter but requires that new Home Assistant user manually input the serial path, radio type (EZSP) and bauddate when adding ZHA. Existing Home Assistant users will have to backup and edit the `.storage/.core.config_entries` file and update the listed baud rate.
+For advanced users - An alternative 115200 bps firmware image is available for HUSBZB-1, `ncp-uart-sw-6.7.8-115k.ebl`. This provides a faster pathway to the adapter but requires that new Home Assistant user manually input the serial path, radio type (EZSP) and bauddate when adding ZHA. Existing Home Assistant users will have to backup and edit the `.storage/.core.config_entries` file and add the listed baud rate under the zha entry using the following format:
+
+```yaml
+"domain": "zha",
+"title": "/dev/ttyUSB1",
+"data": {
+    "device": {
+        "baudrate": 115200,
+        "path": "/dev/ttyUSB1"
+    },
+    "radio_type": "ezsp"
+},
+```
 
 As of March 2021, hardware flow control has been added to bellows/zigpy - Only flash any of the images in the `hw-flow-control` folder unless you know what you are doing. 
 
