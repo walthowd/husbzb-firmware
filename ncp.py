@@ -57,6 +57,13 @@ SONOFF_BAUD = 115200
 SONOFF_XON_XOFF = True
 SONOFF_RTS_CTS = False
 
+# BV BV2010
+BV2010_VID = '10C4'
+BV2010_PID = '8B34'
+BV2010_BAUD = 57600
+BV2010_XON_XOFF = True
+BV2010_RTS_CTS = False
+
 def is_valid_file(parser, arg):
     if not os.path.isfile(arg):
         parser.error("The file %s does not exist!" % arg)
@@ -279,6 +286,13 @@ def flash(port, file):
                 XON_XOFF = WSTK_XON_XOFF
                 RTS_CTS = WSTK_RTS_CTS
                 break
+			# Check BV2010  stick
+            if vid == BV2010_VID and pid == BV2010_PID:
+                print('BV2010 stick')
+                BAUD = BV2010_BAUD
+                XON_XOFF = BV2010_XON_XOFF
+                RTS_CTS = BV2010_RTS_CTS
+                break               
 
     # Init serial port
     ser = serial.Serial(
@@ -391,7 +405,7 @@ def scan():
             portjson['pid'] = pid
 
             # Check which USB NCP device
-            if vid == CEL_VID and pid == CEL_PID or vid == WSTK_VID and pid == WSTK_PID or vid == ETRX_VID and pid == ETRX_PID or vid == SONOFF_VID and pid == SONOFF_PID:
+            if vid == CEL_VID and pid == CEL_PID or vid == WSTK_VID and pid == WSTK_PID or vid == ETRX_VID and pid == ETRX_PID or vid == SONOFF_VID and pid == SONOFF_PID or vid == BV2010_VID and pid == BV2010_PID:
                 # Use EM3588 USB stick as default
                 BAUD = CEL_BAUD
                 XON_XOFF = CEL_XON_XOFF
@@ -406,7 +420,11 @@ def scan():
                     BAUD = SONOFF_BAUD
                     XON_XOFF = SONOFF_XON_XOFF
                     RTS_CTS = SONOFF_RTS_CTS
-                    
+                # Check if BV2010 board
+                if vid == BV2010_VID and pid == BV2010_PID:
+                    BAUD = BV2010_BAUD
+                    XON_XOFF = BV2010_XON_XOFF
+                    RTS_CTS = BV2010_RTS_CTS
                 sys.stderr.write('Connecting to.. %s %s %s %s \n' % (port[0], BAUD, XON_XOFF, RTS_CTS))
 
                 # Init serial port
