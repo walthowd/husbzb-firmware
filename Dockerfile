@@ -1,7 +1,7 @@
 #FROM ubuntu:20.04 
-FROM python:buster
+FROM arm64v8/python
 
-MAINTAINER Walt Howd <walthowd@gmail.com>
+MAINTAINER Eibo Richter <eibo.richter@gmail.com>
 
 WORKDIR /tmp/silabs
 
