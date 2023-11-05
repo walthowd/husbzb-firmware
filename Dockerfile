@@ -11,7 +11,7 @@ WORKDIR /tmp/silabs
 RUN apt-get update \
   && apt-get install -y git wget python3-pip unzip jq curl
 
-RUN pip3 install --upgrade git+git://github.com/zigpy/bellows.git
+RUN pip3 install --upgrade git+https://github.com/zigpy/bellows.git
 
 RUN pip3 install pyserial xmodem
 
